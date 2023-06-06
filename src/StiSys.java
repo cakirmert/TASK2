@@ -13,9 +13,9 @@ public class StiSys {
         Professor instructor = new Professor("Jane Smith","password");
 
         // Create lab course
-        Course labCourse = CourseFactory.createCourse("lab","Software Engineering LAB", 3, instructor);
+        Course labCourse = SystemFactory.createCourse("lab","Software Engineering LAB", 3, instructor);
         // Create generic course
-        Course genericCourse = CourseFactory.createCourse("generic","Software Engineering", 4, professor);
+        Course genericCourse = SystemFactory.createCourse("generic","Software Engineering", 4, professor);
 
         //Save courses to database
         int genericCourseId = database.saveCourse(genericCourse);

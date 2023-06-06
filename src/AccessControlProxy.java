@@ -1,28 +1,21 @@
-import java.io.IOException;
-import java.sql.*;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-
+/**
+ * AccessControlProxy is the proxy class for the ControlledObject interface
+ * and is the proxy for the Course and Student classes. It is responsible for
+ * logging all the actions of the user and delegating method calls to the
+ * ControlledObject interface.
+ */
+public
 class AccessControlProxy<T extends ControlledObject> {
     private final T target;
-    private final Logger logger;
-
+    private final LoggingSingleton logger;
 
     private AccessControlProxy(T target) {
         this.target = target;
-        this.logger = Logger.getLogger(AccessControlProxy.class.getName());
-        configureLogger();
+        this.logger = LoggingSingleton.getInstance();
     }
-
 
     public static <T extends ControlledObject> AccessControlProxy<T> getInstance(T target) {
         return new AccessControlProxy<>(target);
-    }
-
-    private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection("jdbc:mysql://localhost:3306/stisys", "root", "123456");
     }
 
     public T getControlledObject() {
@@ -33,54 +26,7 @@ class AccessControlProxy<T extends ControlledObject> {
         Student student = controlledStudent.getControlledObject();
         Course course =controlledgenericCourse.getControlledObject();
         course.enrollStudent(student);
-        logger.info("Enrolling student: " + student.getName() + " in course: " + course.getCourseName());
-    }
-
-    private boolean authenticateUser(User user) {
-        int id = user.getId();
-        String password = user.getPassword();
-
-        try (Connection connection = getConnection()) {
-            String sql = "SELECT * FROM user WHERE id = ? AND password = ?";
-            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-                pstmt.setInt(1, id);
-                pstmt.setString(2, password);
-
-                try (ResultSet rs = pstmt.executeQuery()) {
-                    // If the query returns a result, authentication is successful
-                    return rs.next();
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return false;
-    }
-
-    private boolean authorizeEnrollment(User student) {
-        // Logic to authorize enrollment for the student in the course
-        // Return true if the student is authorized, for now this is not fully implemented
-        return authenticateUser(student);
-    }
-
-    //private boolean authorizeAccess(User professor) {
-    // Logic to authorize access to the course information
-    // Return true if the student is authorized, for now this is not fully implemented
-    //   return authenticateUser(professor);
-    //}
-    private void configureLogger() {
-        try {
-            // Create a FileHandler to log messages into a file
-            FileHandler fileHandler = new FileHandler("access.log", true);
-            fileHandler.setFormatter(new SimpleFormatter());
-
-            // Set the logging level and add the FileHandler to the logger
-            logger.setLevel(Level.INFO);
-            logger.addHandler(fileHandler);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        logger.logInfo("Enrolling student: " + student.getName() + " in course: " + course.getCourseName());
     }
 
     public void setGrades(AccessControlProxy<Student> controlledstudent, AccessControlProxy<Course> controlledcourse, int grade) {
@@ -88,7 +34,7 @@ class AccessControlProxy<T extends ControlledObject> {
         Course course = controlledcourse.getControlledObject();
         Database db = new Database();
         db.saveGrade(student,course, 1, grade);
-        logger.info("Setting grade: " + grade + " for student: " + student.getName() + " in course: " + course.getCourseName());
+        logger.logInfo("Setting grade: " + grade + " for student: " + student.getName() + " in course: " + course.getCourseName());
 
     }
 
@@ -127,6 +73,6 @@ class AccessControlProxy<T extends ControlledObject> {
     }
     Course callfactory(String courseType, String courseName, int credits, AccessControlProxy<Professor> professor){
         Professor prof=professor.getControlledObject();
-      return  CourseFactory.createCourse(courseType,courseName,credits,prof);
+      return  SystemFactory.createCourse(courseType,courseName,credits,prof);
     }
 }
