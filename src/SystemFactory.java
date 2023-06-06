@@ -3,7 +3,7 @@ class SystemFactory {
         if (courseType.equalsIgnoreCase("generic")) {
             return new Course(courseName, credits, professor);
         } else if (courseType.equalsIgnoreCase("lab")) {
-            return new Lab(courseName + " Lab", credits, professor);
+            return new Course(courseName + " Lab", credits, professor);
         } else {
             throw new IllegalArgumentException("Invalid course type: " + courseType);
         }

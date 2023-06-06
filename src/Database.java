@@ -2,10 +2,16 @@ import java.sql.*;
 
 // Database class
 class Database implements ControlledObject {
+    
     private Connection connection;
 
     public Database() {
         // Initialize the database connection
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         try {
             connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/stisys", "root", "123456");
         } catch (SQLException e) {
@@ -44,22 +50,9 @@ class Database implements ControlledObject {
         }
     }
 
-    public void saveGrade(Student student, int courseId, int pvl, int result) {
-        String sql = "UPDATE results SET pvl = ?, result = ? WHERE student_id = ? AND course_id = ?";
-
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, pvl);
-            pstmt.setInt(2, result);
-            pstmt.setInt(3, student.getId());
-            pstmt.setInt(4, courseId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     public void displayCourseInfo(int courseId) {
-        String sql = "SELECT course_name, credits, professor_name FROM course WHERE course_id = ?";
+        String sql = "SELECT course_name, credits, professor_name FROM course WHERE id = ?";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, courseId);
@@ -81,7 +74,7 @@ class Database implements ControlledObject {
     }
 
     public int saveCourse(Course course) {
-        String sql = "INSERT INTO course (course_name, credits, professor_name) VALUES (?, ?)";
+        String sql = "INSERT INTO course (course_name, credits, professor_name) VALUES (?, ?, ?)";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, course.getCourseName());
@@ -100,28 +93,54 @@ class Database implements ControlledObject {
         return -1;
     }
 
-    public void saveGrade(Student student, Course course, int pvl, int result) {
-        String sql = "UPDATE results SET pvl = ?, grade = ? WHERE student_id = ? AND course_id = ?";
-
+    public void saveGrade(Student student, Course course, int result) {
+        String sql = "SELECT pvl FROM results WHERE student_id = ? AND course_id = ?";
+        
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, pvl);
-            pstmt.setInt(2, result);
-            pstmt.setInt(3, student.getId());
-            pstmt.setInt(4, course.getCourseID());
-            pstmt.executeUpdate();
+            pstmt.setInt(1, student.getId());
+            pstmt.setInt(2, course.getCourseID());
+            ResultSet rs = pstmt.executeQuery();
+    
+            if (rs.next()) {
+                Integer pvl = rs.getInt("pvl");
+                
+                if (pvl == 0) {
+                    System.out.println("Error: Student didn't pass the lab.");
+                } else if (pvl == 1 || pvl == null) {
+                    String updateSql = "UPDATE results SET pvl = ?, grade = ? WHERE student_id = ? AND course_id = ?";
+                    try (PreparedStatement updatePstmt = connection.prepareStatement(updateSql)) {
+                        updatePstmt.setInt(1, pvl);
+                        updatePstmt.setInt(2, result);
+                        updatePstmt.setInt(3, student.getId());
+                        updatePstmt.setInt(4, course.getCourseID());
+                        updatePstmt.executeUpdate();
+                    }
+                } else {
+                    System.out.println("PVL is not set. Grade cannot be set.");
+                }
+            } else {
+                System.out.println("No result found for the student and course.");
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+    
 
-    public void setPVL(Student student, Course course, boolean pvl) {
-        int pvlValue = pvl ? 1 : 0;
-        String sql = "UPDATE results SET pvl = ? WHERE student_id = ? AND course_id = ?";
+    public void setPVL(Student student, Course course, int pvl) {
+        String sql;
+        if (pvl == 2) {
+            sql = "UPDATE results SET pvl = NULL WHERE student_id = ? AND course_id = ?";
+        } else {
+            sql = "UPDATE results SET pvl = ? WHERE student_id = ? AND course_id = ?";
+        }
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, pvlValue);
-            pstmt.setInt(2, student.getId());
-            pstmt.setInt(3, course.getCourseID());
+            if (pvl != 2) {
+                pstmt.setInt(1, pvl);
+            }
+            pstmt.setInt(pvl == 2 ? 1 : 2, student.getId());
+            pstmt.setInt(pvl == 2 ? 2 : 3, course.getCourseID());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -140,17 +159,18 @@ class Database implements ControlledObject {
     
             while (rs.next()) {
                 int courseId = rs.getInt("course_id");
-                boolean pvl = rs.getBoolean("pvl");
+                Short pvl = rs.getShort("pvl");
                 String courseName = rs.getString("course_name");
     
                 System.out.println("Course: " + courseName);
-                System.out.println("Course: " + courseId);
-                System.out.println("PVL: " + (pvl ? "Pass" : "Fail"));
-    
-                if (!pvl) {
+                System.out.println("Course ID: " + courseId);
+                System.out.println("PVL: " + (pvl == 0 ? "Fail" : pvl == 1 ? "Pass" : "Not Set"));
+
+                if (pvl == 2) {
                     int grade = rs.getInt("grade");
                     System.out.println("Grade: " + grade);
                 }
+                
     
                 System.out.println();
             }
@@ -198,9 +218,6 @@ class Database implements ControlledObject {
 
     }
 
-    public void saveGrade(Student student, int pvl, int result) {
-
-    }
 
     public void setId(int id) {
 
@@ -209,4 +226,6 @@ class Database implements ControlledObject {
     public int getId() {
         return 0;
     }
+
+
 }

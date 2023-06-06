@@ -1,4 +1,3 @@
-// Employee class (base class for Professor and Instructor)
 abstract class User implements ControlledObject {
     private final String name;
     private int id;

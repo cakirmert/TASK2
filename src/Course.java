@@ -19,7 +19,7 @@ class Course implements ControlledObject {
 
     public void saveGrade(Student student, int pvl, int result) {
         Database database = new Database();
-        database.saveGrade(student, this.courseID, pvl, result);
+        database.saveGrade(student, this, result);
         database.close();
     }
 

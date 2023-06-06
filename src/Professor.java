@@ -35,15 +35,10 @@ class Professor extends User {
 
     public void setGrades(Student student, Course course, int grade) {
         Database db = new Database();
-        int pvl=0;
-        db.saveGrade(student, course, pvl, grade);
+        db.saveGrade(student, course, grade);
         db.close();
     }
-    public void setPVL(Student student, Course course, boolean pvl) {
-        Database db = new Database();
-        db.setPVL(student, course, pvl);
-        db.close();
-    }
+
     public void saveGrade(Student student, int pvl, int result) {
 
     }
