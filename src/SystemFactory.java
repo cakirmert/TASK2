@@ -1,7 +1,7 @@
 class SystemFactory {
     public static Course createCourse(String courseType, String courseName, int credits, Professor professor) {
         if (courseType.equalsIgnoreCase("generic")) {
-            return new GenericCourse(courseName, credits, professor);
+            return new Course(courseName, credits, professor);
         } else if (courseType.equalsIgnoreCase("lab")) {
             return new Lab(courseName + " Lab", credits, professor);
         } else {

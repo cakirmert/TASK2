@@ -1,0 +1,28 @@
+-- Table structure for table `course`
+CREATE TABLE IF NOT EXISTS `course` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `course_name` varchar(255) DEFAULT NULL,
+  `credits` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Table structure for table `user`
+CREATE TABLE IF NOT EXISTS `user` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) DEFAULT NULL,
+  `password` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Table structure for table `results`
+CREATE TABLE IF NOT EXISTS `results` (
+  `student_id` int NOT NULL,
+  `course_id` int NOT NULL,
+  `is_lab` tinyint(1) DEFAULT NULL,
+  `grade` int DEFAULT NULL,
+  `pvl` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`student_id`, `course_id`),
+  KEY `course_id` (`course_id`),
+  CONSTRAINT `results_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `user` (`id`),
+  CONSTRAINT `results_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

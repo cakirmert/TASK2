@@ -1,0 +1,16 @@
+Jun 06, 2023 6:56:38 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering Lab
+Jun 06, 2023 6:56:38 PM LoggingSingleton logInfo
+INFO: Setting grade: 15 for student: Alice Johnson in course: Software Engineering Lab
+Jun 06, 2023 7:01:41 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering Lab
+Jun 06, 2023 7:01:41 PM LoggingSingleton logInfo
+INFO: Setting grade: 15 for student: Alice Johnson in course: Software Engineering Lab
+Jun 06, 2023 7:21:54 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering Lab
+Jun 06, 2023 7:21:54 PM LoggingSingleton logInfo
+INFO: Setting grade: 15 for student: Alice Johnson in course: Software Engineering Lab
+Jun 06, 2023 7:32:14 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering Lab
+Jun 06, 2023 7:32:14 PM LoggingSingleton logInfo
+INFO: Setting grade: 15 for student: Alice Johnson in course: Software Engineering Lab

@@ -27,7 +27,7 @@ CREATE TABLE `course` (
   `course_name` varchar(255) DEFAULT NULL,
   `credits` int DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=149 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,8 +40,9 @@ DROP TABLE IF EXISTS `results`;
 CREATE TABLE `results` (
   `student_id` int NOT NULL,
   `course_id` int NOT NULL,
-  `pvl` int DEFAULT NULL,
-  `result` int DEFAULT NULL,
+  `is_lab` tinyint(1) DEFAULT NULL,
+  `grade` int DEFAULT NULL,
+  `pvl` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`student_id`,`course_id`),
   KEY `course_id` (`course_id`),
   CONSTRAINT `results_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `user` (`id`),
@@ -61,7 +62,7 @@ CREATE TABLE `user` (
   `username` varchar(255) DEFAULT NULL,
   `password` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=71 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -73,4 +74,4 @@ CREATE TABLE `user` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-06-06 18:52:32
+-- Dump completed on 2023-06-06 19:41:00
