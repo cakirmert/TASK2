@@ -127,25 +127,21 @@ class Database implements ControlledObject {
     }
     
 
-    public void setPVL(Student student, Course course, int pvl) {
-        String sql;
-        if (pvl == 2) {
-            sql = "UPDATE results SET pvl = NULL WHERE student_id = ? AND course_id = ?";
-        } else {
-            sql = "UPDATE results SET pvl = ? WHERE student_id = ? AND course_id = ?";
-        }
-
+    public void setPVL(Student student, Course course, boolean pvl) {
+        int pvlValue = pvl ? 1 : 0;
+    
+        String sql = "UPDATE results SET pvl = ? WHERE student_id = ? AND course_id = ?";
+    
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            if (pvl != 2) {
-                pstmt.setInt(1, pvl);
-            }
-            pstmt.setInt(pvl == 2 ? 1 : 2, student.getId());
-            pstmt.setInt(pvl == 2 ? 2 : 3, course.getCourseID());
+            pstmt.setInt(1, pvlValue);
+            pstmt.setInt(2, student.getId());
+            pstmt.setInt(3, course.getCourseID());
             pstmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+    
 
     public void viewGrades(Student student) {
         String sql = "SELECT results.course_id, results.pvl, results.grade, course.course_name " +

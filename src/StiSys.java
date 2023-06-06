@@ -20,13 +20,13 @@ int controlledStudentId = controlledDatabase.saveStudent(controlledStudent);
 controlledStudent.setStudentId(controlledStudentId);
 
 // Enroll the student in the lab course
-controlledLab.enrollStudent(controlledStudent,controlledLab);
+controlledStudent.enroll(controlledLab);
 
 // Display course information
 controlledLab.displayCourseInfo(controlledLab);
 
 // Professor gives PVL to the student in the lab course
-controlledLab.setPVL(controlledStudent, controlledLab, 1);
+controlledInstructor.setPVL(controlledStudent, controlledLab, true);
 
 // Student views PVL Status
 controlledStudent.viewGrades();

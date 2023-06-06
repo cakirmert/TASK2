@@ -11,19 +11,55 @@ public class AccessControlProxy<T extends ControlledObject> {
         return new AccessControlProxy<>(target);
     }
 
-    public void enrollStudent(AccessControlProxy<Student> controlledStudent, AccessControlProxy<Course> controlledgenericCourse) {
-        Student student = controlledStudent.target;
-        Course course = controlledgenericCourse.target;
-        course.enrollStudent(student);
-        logger.logInfo("Enrolling student: " + student.getName() + " in course: " + course.getCourseName());
+    private boolean isAccessAllowed(String requiredRole) {
+        
+        // Check the role of the current user against the required role
+        // Return true if access is allowed, false otherwise
+        
+        if (requiredRole.equals("Professor")) {
+            if (target instanceof Professor) {
+                return true;
+            }
+        } else if (requiredRole.equals("Student")) {
+            if (target instanceof Student) {
+                return true;
+            }
+        }  
+        
+        return false;
+    }
+    public void enroll(AccessControlProxy<Course> course) {
+        if (isAccessAllowed("student")) {
+            Student student = (Student) target;
+            student.enroll((Course) target);
+            logger.logInfo("Enrolling student: " + student.getName() + " in course: " + target.getCourseName());
+        } else {
+            logger.logWarning("Access denied for enrollStudent operation.");
+        }
     }
 
-    public void setGrades(AccessControlProxy<Student> controlledstudent, AccessControlProxy<Course> controlledcourse, int grade) {
-        Student student = controlledstudent.target;
-        Course course = controlledcourse.target;
-        Database db = new Database();
-        db.saveGrade(student, course, grade);
-        logger.logInfo("Setting grade: " + grade + " for student: " + student.getName() + " in course: " + course.getCourseName());
+    public void setGrades(AccessControlProxy<Student> controlledStudent, AccessControlProxy<Course> controlledCourse, int grade) {
+        if (isAccessAllowed("professor")) {
+            Student student = controlledStudent.target;
+            Course course = controlledCourse.target;
+            Database db = new Database();
+            db.saveGrade(student, course, grade);
+            logger.logInfo("Setting grade: " + grade + " for student: " + student.getName() + " in course: " + course.getCourseName());
+        } else {
+            logger.logWarning("Access denied for setGrades operation.");
+        }
+    }
+
+    public void setPVL(AccessControlProxy<Student> controlledStudent, AccessControlProxy<Course> controlledCourse, Boolean pvl) {
+        if (isAccessAllowed("professor")) {
+            Student student = controlledStudent.target;
+            Course course = controlledCourse.target;
+            Database db = new Database();
+            db.setPVL(student, course, pvl);
+            logger.logInfo("Setting PVL: " + pvl + " for student: " + student.getName() + " in course: " + course.getCourseName());
+        } else {
+            logger.logWarning("Access denied for setPVL operation.");
+        }
     }
 
     public void setCourseId(int course) {
@@ -58,11 +94,4 @@ public class AccessControlProxy<T extends ControlledObject> {
         return SystemFactory.createCourse(courseType, courseName, credits, professor.target);
     }
 
-    public void setPVL(AccessControlProxy<Student> controlledstudent, AccessControlProxy<Course> controlledcourse, int PVL) {
-        Student student = controlledstudent.target;
-        Course course = controlledcourse.target;
-        Database db = new Database();
-        db.setPVL(student, course, PVL);
-        logger.logInfo("Setting PVL: " + PVL + " for student: " + student.getName() + " in course: " + course.getCourseName());
-    }
 }
