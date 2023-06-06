@@ -29,8 +29,6 @@ class Professor extends User {
         return 0;
     }
 
-
-
     public void setId(int id) {
         this.id = id;
     }

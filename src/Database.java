@@ -32,12 +32,61 @@ class Database implements ControlledObject {
         return -1;
     }
 
+    public void enrollStudent(Student student, int courseId) {
+        String sql = "INSERT INTO results (student_id, course_id) VALUES (?, ?)";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, student.getId());
+            pstmt.setInt(2, courseId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveGrade(Student student, int courseId, int pvl, int result) {
+        String sql = "UPDATE results SET pvl = ?, result = ? WHERE student_id = ? AND course_id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, pvl);
+            pstmt.setInt(2, result);
+            pstmt.setInt(3, student.getId());
+            pstmt.setInt(4, courseId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void displayCourseInfo(int courseId) {
+        String sql = "SELECT course_name, credits, professor_name FROM course WHERE course_id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, courseId);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                String courseName = rs.getString("course_name");
+                int credits = rs.getInt("credits");
+                String professorName = rs.getString("professor_name");
+
+                System.out.println("Course Name: " + courseName);
+                System.out.println("Course ID: " + courseId);
+                System.out.println("Credits: " + credits);
+                System.out.println("Professor: " + professorName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public int saveCourse(Course course) {
-        String sql = "INSERT INTO course (course_name, credits) VALUES (?, ?)";
+        String sql = "INSERT INTO course (course_name, credits, professor_name) VALUES (?, ?)";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             pstmt.setString(1, course.getCourseName());
             pstmt.setInt(2, course.getCredits());
+            pstmt.setString(3, course.getProfessor());
             pstmt.executeUpdate();
 
             ResultSet rs = pstmt.getGeneratedKeys();
@@ -78,6 +127,38 @@ class Database implements ControlledObject {
             e.printStackTrace();
         }
     }
+
+    public void viewGrades(Student student) {
+        String sql = "SELECT results.course_id, results.pvl, results.grade, course.course_name " +
+                     "FROM results " +
+                     "INNER JOIN course ON results.course_id = course.id " +
+                     "WHERE results.student_id = ?";
+    
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, student.getId());
+            ResultSet rs = pstmt.executeQuery();
+    
+            while (rs.next()) {
+                int courseId = rs.getInt("course_id");
+                boolean pvl = rs.getBoolean("pvl");
+                String courseName = rs.getString("course_name");
+    
+                System.out.println("Course: " + courseName);
+                System.out.println("Course: " + courseId);
+                System.out.println("PVL: " + (pvl ? "Pass" : "Fail"));
+    
+                if (!pvl) {
+                    int grade = rs.getInt("grade");
+                    System.out.println("Grade: " + grade);
+                }
+    
+                System.out.println();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
 
     public Connection getConnection() {
         return connection;

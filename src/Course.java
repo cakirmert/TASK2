@@ -1,7 +1,4 @@
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
-// GenericCourse class implementing ControlledObject interface
+// Course class implementing ControlledObject interface
 class Course implements ControlledObject {
     private final String courseName;
     private final int credits;
@@ -16,38 +13,20 @@ class Course implements ControlledObject {
 
     public void enrollStudent(Student student) {
         Database database = new Database();
-        String sql = "INSERT INTO results (student_id, course_id) VALUES (?, ?)";
-
-        try (PreparedStatement pstmt = database.getConnection().prepareStatement(sql)) {
-            pstmt.setInt(1, student.getId());
-            pstmt.setInt(2, this.courseID);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    public void saveGrade(Student student, int pvl, int result) {
-        Database database = new Database();
-        String sql = "UPDATE results SET pvl = ?, result = ? WHERE student_id = ? AND course_id = ?";
-
-        try (PreparedStatement pstmt = database.getConnection().prepareStatement(sql)) {
-            pstmt.setInt(1, pvl);
-            pstmt.setInt(2, result);
-            pstmt.setInt(3, student.getId());
-            pstmt.setInt(4, this.courseID);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
+        database.enrollStudent(student, this.courseID);
         database.close();
     }
-    
+
+    public void saveGrade(Student student, int pvl, int result) {
+        Database database = new Database();
+        database.saveGrade(student, this.courseID, pvl, result);
+        database.close();
+    }
+
     public void displayCourseInfo() {
-        System.out.println("Course Name: " + courseName);
-        System.out.println("Course ID: " + courseID);
-        System.out.println("Credits: " + credits);
-        System.out.println("Professor: " + professor.getName());
+        Database database = new Database();
+        database.displayCourseInfo(this.courseID);
+        database.close();
     }
 
     public String getCourseName() {
@@ -69,10 +48,8 @@ class Course implements ControlledObject {
         this.courseID = id;
     }
 
-    @Override
-    public int getId() {
-        // This method is only needed for the AccessControlProxy
-        throw new UnsupportedOperationException("Unimplemented method 'getId'");
+    public String getProfessor() {
+        return this.professor.getName();
     }
 
 }

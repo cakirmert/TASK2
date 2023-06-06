@@ -9,6 +9,4 @@ interface ControlledObject {
     void saveGrade(Student student, int pvl, int result);
 
     void setId(int id);
-
-    int getId();
 }
