@@ -1,7 +1,3 @@
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 // Student class
 class Student extends User {
 
@@ -59,20 +55,8 @@ class Student extends User {
 
     public void viewGrades() {
         Database database = new Database();
-        String sql = "SELECT course_id, pvl, grade FROM results WHERE student_id = ?";
-
-        try (PreparedStatement pstmt = database.getConnection().prepareStatement(sql)) {
-            pstmt.setInt(1, this.id);
-            ResultSet rs = pstmt.executeQuery();
-
-            while (rs.next()) {
-                System.out.println("Course: " + rs.getInt("course_id"));
-                System.out.println("PVL: " + rs.getInt("pvl"));
-                System.out.println("Result: " + rs.getInt("grade"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        database.viewGrades(this);
+        database.close();
     }
 }
 
