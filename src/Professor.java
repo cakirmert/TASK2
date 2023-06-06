@@ -1,5 +1,5 @@
 // Professor class (subclass of Employee)
-class Professor extends User implements ControlledObject {
+class Professor extends User {
     private final String password;
     private int id;
     public Professor(String name, String password) {

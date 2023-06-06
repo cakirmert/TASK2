@@ -3,7 +3,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 // Student class
-class Student extends User implements ControlledObject {
+class Student extends User {
 
 
     private final String name;
