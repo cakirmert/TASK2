@@ -4,7 +4,6 @@ import java.sql.*;
 class Database implements ControlledObject {
     private Connection connection;
 
-
     public Database() {
         // Initialize the database connection
         try {
@@ -51,8 +50,9 @@ class Database implements ControlledObject {
 
         return -1;
     }
-    public void saveGrade(Student student, Course course, int pvl, Integer result) {
-        String sql = "UPDATE results SET pvl = ?, result = ? WHERE student_id = ? AND course_id = ?";
+
+    public void saveGrade(Student student, Course course, int pvl, int result) {
+        String sql = "UPDATE results SET pvl = ?, grade = ? WHERE student_id = ? AND course_id = ?";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, pvl);
@@ -65,8 +65,22 @@ class Database implements ControlledObject {
         }
     }
 
+    public void setPVL(Student student, Course course, boolean pvl) {
+        int pvlValue = pvl ? 1 : 0;
+        String sql = "UPDATE results SET pvl = ? WHERE student_id = ? AND course_id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, pvlValue);
+            pstmt.setInt(2, student.getId());
+            pstmt.setInt(3, course.getCourseID());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public Connection getConnection() {
-    return connection;
+        return connection;
     }
 
     public void close() {

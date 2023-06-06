@@ -59,7 +59,7 @@ class Student extends User {
 
     public void viewGrades() {
         Database database = new Database();
-        String sql = "SELECT course_id, pvl, result FROM results WHERE student_id = ?";
+        String sql = "SELECT course_id, pvl, grade FROM results WHERE student_id = ?";
 
         try (PreparedStatement pstmt = database.getConnection().prepareStatement(sql)) {
             pstmt.setInt(1, this.id);
@@ -68,7 +68,7 @@ class Student extends User {
             while (rs.next()) {
                 System.out.println("Course: " + rs.getInt("course_id"));
                 System.out.println("PVL: " + rs.getInt("pvl"));
-                System.out.println("Result: " + rs.getInt("result"));
+                System.out.println("Result: " + rs.getInt("grade"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

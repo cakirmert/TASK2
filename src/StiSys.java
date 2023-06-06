@@ -13,13 +13,13 @@ public class StiSys {
         Professor instructor = SystemFactory.createProfessor("Jane Smith","password");
 
         // Create lab course
-        Course labCourse = SystemFactory.createCourse("lab","Software Engineering LAB", 3, instructor);
+        Course lab = SystemFactory.createCourse("lab","Software Engineering", 3, instructor);
         // Create generic course
         Course genericCourse = SystemFactory.createCourse("generic","Software Engineering", 4, professor);
 
         //Save courses to database
         genericCourse.setId(database.saveCourse(genericCourse));
-        labCourse.setId(database.saveCourse(labCourse));
+        lab.setId(database.saveCourse(lab));
 
         // Create student instance
         Student student = SystemFactory.createStudent("Alice Johnson","cleartext");
@@ -28,14 +28,14 @@ public class StiSys {
 
         // Enroll the student in the courses
         genericCourse.enrollStudent(student);
-        labCourse.enrollStudent(student);
+        lab.enrollStudent(student);
 
         // Display course information
-        labCourse.displayCourseInfo();
+        lab.displayCourseInfo();
         genericCourse.displayCourseInfo();
 
         // Professor gives PVL to the student in the lab course
-        database.saveGrade(student, labCourse, 1, 0);
+        instructor.setPVL(student, lab, true);
         // Student views PVL Status
         student.viewGrades();
 
