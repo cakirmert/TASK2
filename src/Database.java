@@ -73,7 +73,7 @@ class Database implements ControlledObject {
         }
     }
 
-    public int saveCourse(Course course) {
+    public int saveCourse(Course course) {///////////////////////////LAB should be added!!!!!!!!!
         String sql = "INSERT INTO course (course_name, credits, professor_name) VALUES (?, ?, ?)";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -142,6 +142,7 @@ class Database implements ControlledObject {
         }
     }
     
+    
 
     public void viewGrades(Student student) {
         String sql = "SELECT results.course_id, results.pvl, results.grade, course.course_name " +
@@ -155,18 +156,17 @@ class Database implements ControlledObject {
     
             while (rs.next()) {
                 int courseId = rs.getInt("course_id");
-                Short pvl = rs.getShort("pvl");
+                int pvl = rs.getInt("pvl");
                 String courseName = rs.getString("course_name");
     
                 System.out.println("Course: " + courseName);
                 System.out.println("Course ID: " + courseId);
-                System.out.println("PVL: " + (pvl == 0 ? "Fail" : pvl == 1 ? "Pass" : "Not Set"));
-
+                System.out.println("PVL: " + getPVLStatus(pvl));
+    
                 if (pvl == 2) {
                     int grade = rs.getInt("grade");
                     System.out.println("Grade: " + grade);
                 }
-                
     
                 System.out.println();
             }
@@ -174,6 +174,18 @@ class Database implements ControlledObject {
             e.printStackTrace();
         }
     }
+    
+    private String getPVLStatus(int pvl) {
+        switch (pvl) {
+            case 0:
+                return "Fail";
+            case 1:
+                return "Pass";
+            default:
+                return "Unknown";
+        }
+    }
+    
     
 
     public Connection getConnection() {

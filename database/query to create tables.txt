@@ -1,9 +1,24 @@
+-- Drop existing tables if they exist
+DROP TABLE IF EXISTS `results`;
+DROP TABLE IF EXISTS `lab`;
+DROP TABLE IF EXISTS `course`;
+DROP TABLE IF EXISTS `user`;
+
 -- Table structure for table `course`
 CREATE TABLE IF NOT EXISTS `course` (
   `id` int NOT NULL AUTO_INCREMENT,
   `course_name` varchar(255) DEFAULT NULL,
   `credits` int DEFAULT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Table structure for table `lab`
+CREATE TABLE IF NOT EXISTS `lab` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `course_id` int NOT NULL,
+  `pvl` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `lab_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Table structure for table `user`
@@ -18,11 +33,13 @@ CREATE TABLE IF NOT EXISTS `user` (
 CREATE TABLE IF NOT EXISTS `results` (
   `student_id` int NOT NULL,
   `course_id` int NOT NULL,
-  `is_lab` tinyint(1) DEFAULT NULL,
+  `lab_id` int DEFAULT NULL,
   `grade` int DEFAULT NULL,
   `pvl` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`student_id`, `course_id`),
   KEY `course_id` (`course_id`),
+  KEY `lab_id` (`lab_id`),
   CONSTRAINT `results_ibfk_1` FOREIGN KEY (`student_id`) REFERENCES `user` (`id`),
-  CONSTRAINT `results_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`)
+  CONSTRAINT `results_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`),
+  CONSTRAINT `results_ibfk_3` FOREIGN KEY (`lab_id`) REFERENCES `lab` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

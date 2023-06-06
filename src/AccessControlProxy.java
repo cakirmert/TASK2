@@ -11,6 +11,10 @@ public class AccessControlProxy<T extends ControlledObject> {
         return new AccessControlProxy<>(target);
     }
 
+    private T getcontrolledobject() {
+        return target;
+    }
+
     private boolean isAccessAllowed(String requiredRole) {
         
         // Check the role of the current user against the required role
@@ -29,17 +33,17 @@ public class AccessControlProxy<T extends ControlledObject> {
         return false;
     }
     public void enroll(AccessControlProxy<Course> course) {
-        if (isAccessAllowed("student")) {
+        if (isAccessAllowed("Student")) {
             Student student = (Student) target;
-            student.enroll((Course) target);
-            logger.logInfo("Enrolling student: " + student.getName() + " in course: " + target.getCourseName());
+            student.enroll(course.getcontrolledobject());
+            logger.logInfo("Enrolling student: " + student.getName() + " in course: " + course.getcontrolledobject().getCourseName());
         } else {
             logger.logWarning("Access denied for enrollStudent operation.");
         }
     }
 
     public void setGrades(AccessControlProxy<Student> controlledStudent, AccessControlProxy<Course> controlledCourse, int grade) {
-        if (isAccessAllowed("professor")) {
+        if (isAccessAllowed("Professor")) {
             Student student = controlledStudent.target;
             Course course = controlledCourse.target;
             Database db = new Database();
@@ -50,10 +54,10 @@ public class AccessControlProxy<T extends ControlledObject> {
         }
     }
 
-    public void setPVL(AccessControlProxy<Student> controlledStudent, AccessControlProxy<Course> controlledCourse, Boolean pvl) {
-        if (isAccessAllowed("professor")) {
+    public void setPVL(AccessControlProxy<Student> controlledStudent, AccessControlProxy<Course> controlledLab, Boolean pvl) {
+        if (isAccessAllowed("Professor")) {
             Student student = controlledStudent.target;
-            Course course = controlledCourse.target;
+            Course course = controlledLab.target;
             Database db = new Database();
             db.setPVL(student, course, pvl);
             logger.logInfo("Setting PVL: " + pvl + " for student: " + student.getName() + " in course: " + course.getCourseName());
@@ -90,8 +94,13 @@ public class AccessControlProxy<T extends ControlledObject> {
         ((Database) target).close();
     }
 
-    Course callFactory(String courseType, String courseName, int credits, AccessControlProxy<Professor> professor) {
-        return SystemFactory.createCourse(courseType, courseName, credits, professor.target);
+    Course callFactory(String courseType, String courseName, int credits, AccessControlProxy<Professor> professor, AccessControlProxy<Course> course) {
+        if (course != null && course.getcontrolledobject() != null) {
+            return SystemFactory.createCourse(courseType, courseName, credits, professor.getcontrolledobject(), course.getcontrolledobject());
+        } else {
+            return SystemFactory.createCourse(courseType, courseName, credits, professor.getcontrolledobject(),null);
+        }
     }
+    
 
 }

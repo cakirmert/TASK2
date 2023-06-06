@@ -1,9 +1,11 @@
 class SystemFactory {
-    public static Course createCourse(String courseType, String courseName, int credits, Professor professor) {
+    public static Course createCourse(String courseType, String courseName, int credits, Professor professor, Course course) {
         if (courseType.equalsIgnoreCase("generic")) {
             return new Course(courseName, credits, professor);
         } else if (courseType.equalsIgnoreCase("lab")) {
-            return new Course(courseName + " Lab", credits, professor);
+            Lab lab = new Lab(courseName, credits, professor);
+            course.setLab(lab);
+            return lab;
         } else {
             throw new IllegalArgumentException("Invalid course type: " + courseType);
         }

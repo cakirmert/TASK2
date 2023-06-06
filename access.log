@@ -162,3 +162,75 @@ Jun 06, 2023 10:46:28 PM LoggingSingleton logWarning
 WARNING: Access denied for setPVL operation.
 Jun 06, 2023 10:46:28 PM LoggingSingleton logWarning
 WARNING: Access denied for setGrades operation.
+Jun 06, 2023 11:26:59 PM LoggingSingleton logWarning
+WARNING: Access denied for enrollStudent operation.
+Jun 06, 2023 11:26:59 PM LoggingSingleton logWarning
+WARNING: Access denied for enrollStudent operation.
+Jun 06, 2023 11:27:00 PM LoggingSingleton logWarning
+WARNING: Access denied for setPVL operation.
+Jun 06, 2023 11:27:00 PM LoggingSingleton logWarning
+WARNING: Access denied for setGrades operation.
+Jun 06, 2023 11:32:58 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: null
+Jun 06, 2023 11:32:58 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: null
+Jun 06, 2023 11:32:58 PM LoggingSingleton logWarning
+WARNING: Access denied for setPVL operation.
+Jun 06, 2023 11:32:58 PM LoggingSingleton logInfo
+INFO: Setting grade: 15 for student: Alice Johnson in course: Software Engineering
+Jun 06, 2023 11:33:51 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: null
+Jun 06, 2023 11:33:51 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: null
+Jun 06, 2023 11:33:51 PM LoggingSingleton logWarning
+WARNING: Access denied for setPVL operation.
+Jun 06, 2023 11:33:51 PM LoggingSingleton logInfo
+INFO: Setting grade: 15 for student: Alice Johnson in course: Software Engineering
+Jun 06, 2023 11:35:06 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: null
+Jun 06, 2023 11:35:17 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering Lab
+Jun 06, 2023 11:35:19 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering
+Jun 06, 2023 11:35:19 PM LoggingSingleton logWarning
+WARNING: Access denied for setPVL operation.
+Jun 06, 2023 11:35:19 PM LoggingSingleton logInfo
+INFO: Setting grade: 15 for student: Alice Johnson in course: Software Engineering
+Jun 06, 2023 11:35:52 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering Lab
+Jun 06, 2023 11:35:52 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering
+Jun 06, 2023 11:37:10 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering Lab
+Jun 06, 2023 11:37:14 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering
+Jun 06, 2023 11:37:20 PM LoggingSingleton logInfo
+INFO: Setting PVL: true for student: Alice Johnson in course: Software Engineering Lab
+Jun 06, 2023 11:37:26 PM LoggingSingleton logInfo
+INFO: Setting grade: 15 for student: Alice Johnson in course: Software Engineering
+Jun 06, 2023 11:42:47 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering Lab
+Jun 06, 2023 11:42:47 PM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering
+Jun 06, 2023 11:42:47 PM LoggingSingleton logInfo
+INFO: Setting PVL: true for student: Alice Johnson in course: Software Engineering Lab
+Jun 06, 2023 11:42:47 PM LoggingSingleton logInfo
+INFO: Setting grade: 15 for student: Alice Johnson in course: Software Engineering
+Jun 07, 2023 12:37:39 AM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering
+Jun 07, 2023 12:37:39 AM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering
+Jun 07, 2023 12:37:39 AM LoggingSingleton logInfo
+INFO: Setting PVL: true for student: Alice Johnson in course: Software Engineering
+Jun 07, 2023 12:37:39 AM LoggingSingleton logInfo
+INFO: Setting grade: 15 for student: Alice Johnson in course: Software Engineering
+Jun 07, 2023 12:39:31 AM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering
+Jun 07, 2023 12:39:31 AM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering
+Jun 07, 2023 12:39:31 AM LoggingSingleton logInfo
+INFO: Setting PVL: true for student: Alice Johnson in course: Software Engineering
+Jun 07, 2023 12:39:31 AM LoggingSingleton logInfo
+INFO: Setting grade: 15 for student: Alice Johnson in course: Software Engineering
+Jun 07, 2023 12:44:25 AM LoggingSingleton logInfo
+INFO: Enrolling student: Alice Johnson in course: Software Engineering

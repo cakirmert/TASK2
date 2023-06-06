@@ -4,11 +4,20 @@ class Course implements ControlledObject {
     private final int credits;
     private final Professor professor;
     private int courseID;
+    private Lab lab;
 
     public Course(String courseName, int credits, Professor professor) {
         this.courseName = courseName;
         this.credits = credits;
         this.professor = professor;
+    }   
+
+    public Lab getLab() {
+        return lab;
+    }
+
+    public void setLab(Lab lab) {
+        this.lab = lab;
     }
 
     public void saveGrade(Student student, int pvl, int result) {

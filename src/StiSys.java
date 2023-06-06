@@ -9,9 +9,11 @@ AccessControlProxy<Professor> controlledInstructor = AccessControlProxy.getInsta
 AccessControlProxy<Professor> controlledProfessor = AccessControlProxy.getInstance(SystemFactory.createProfessor("John Doe", "cleartext"));
 
 // Create controlled lab course
-AccessControlProxy<Course> controlledLab = AccessControlProxy.getInstance(controlledDatabase.callFactory("lab","Software Engineering", 3, controlledInstructor));
+AccessControlProxy<Course> controlledCourse = AccessControlProxy.getInstance(controlledDatabase.callFactory("generic","Software Engineering", 3, controlledProfessor,null));
+AccessControlProxy<Course> controlledLab = AccessControlProxy.getInstance(controlledDatabase.callFactory("lab","Software Engineering", 3, controlledInstructor,controlledCourse));
 
 controlledLab.setCourseId(controlledDatabase.saveCourse(controlledLab));
+controlledCourse.setCourseId(controlledDatabase.saveCourse(controlledCourse));
 
 // Create controlled student instance
 AccessControlProxy<Student> controlledStudent = AccessControlProxy.getInstance(SystemFactory.createStudent("Alice Johnson", "cleartext"));
@@ -19,20 +21,21 @@ AccessControlProxy<Student> controlledStudent = AccessControlProxy.getInstance(S
 int controlledStudentId = controlledDatabase.saveStudent(controlledStudent);
 controlledStudent.setStudentId(controlledStudentId);
 
-// Enroll the student in the lab course
+// Enroll the student in the courses
 controlledStudent.enroll(controlledLab);
+controlledStudent.enroll(controlledCourse);
 
 // Display course information
 controlledLab.displayCourseInfo(controlledLab);
+controlledLab.displayCourseInfo(controlledCourse);
 
-// Professor gives PVL to the student in the lab course
+// Professor gives PVL and grade to the student in the lab course
 controlledInstructor.setPVL(controlledStudent, controlledLab, true);
-
 // Student views PVL Status
 controlledStudent.viewGrades();
 
 // Professor sets the grades for the student in the course
-controlledProfessor.setGrades(controlledStudent, controlledLab, 15);
+controlledProfessor.setGrades(controlledStudent, controlledCourse, 15);
 
 // Student views grades after exam
 controlledStudent.viewGrades();
