@@ -1,0 +1,708 @@
+import java.io.IOException;
+import java.sql.*;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
+class AccessControlProxy<T extends ControlledObject> {
+    private final T target;
+    private final Logger logger;
+
+
+    private AccessControlProxy(T target) {
+        this.target = target;
+        this.logger = Logger.getLogger(AccessControlProxy.class.getName());
+        configureLogger();
+    }
+
+
+    public static <T extends ControlledObject> AccessControlProxy<T> getInstance(T target) {
+        return new AccessControlProxy<>(target);
+    }
+
+    private Connection getConnection() throws SQLException {
+        return DriverManager.getConnection("jdbc:mysql://localhost:3306/stisys", "root", "123456");
+    }
+
+    public T getControlledObject() {
+        return target;
+    }
+
+    public void enrollStudent(AccessControlProxy<Student> controlledStudent, AccessControlProxy<Course> controlledgenericCourse) {
+        Student student = controlledStudent.getControlledObject();
+        Course course =controlledgenericCourse.getControlledObject();
+        course.enrollStudent(student);
+    }
+
+    private boolean authenticateUser(User user) {
+        int id = user.getId();
+        String password = user.getPassword();
+
+        try (Connection connection = getConnection()) {
+            String sql = "SELECT * FROM user WHERE id = ? AND password = ?";
+            try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+                pstmt.setInt(1, id);
+                pstmt.setString(2, password);
+
+                try (ResultSet rs = pstmt.executeQuery()) {
+                    // If the query returns a result, authentication is successful
+                    return rs.next();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private boolean authorizeEnrollment(User student) {
+        // Logic to authorize enrollment for the student in the course
+        // Return true if the student is authorized, for now this is not fully implemented
+        return authenticateUser(student);
+    }
+
+    //private boolean authorizeAccess(User professor) {
+    // Logic to authorize access to the course information
+    // Return true if the student is authorized, for now this is not fully implemented
+    //   return authenticateUser(professor);
+    //}
+    private void configureLogger() {
+        try {
+            // Create a FileHandler to log messages into a file
+            FileHandler fileHandler = new FileHandler("access.log", true);
+            fileHandler.setFormatter(new SimpleFormatter());
+
+            // Set the logging level and add the FileHandler to the logger
+            logger.setLevel(Level.INFO);
+            logger.addHandler(fileHandler);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setGrades(AccessControlProxy<Student> controlledstudent, AccessControlProxy<Course> controlledcourse, int grade) {
+        Student student = controlledstudent.getControlledObject();
+        Course course = controlledcourse.getControlledObject();
+        Database db = new Database();
+        db.saveGrade(student,course, 1, grade);
+    }
+
+
+    public void setCourseId(int course) {
+        target.setId(course);
+    }
+
+    public void setStudentId(int id) {
+        target.setId(id);
+    }
+
+    public void displayCourseInfo(AccessControlProxy<T> courseinfo) {
+        courseinfo.getControlledObject().displayCourseInfo();
+    }
+
+    public int saveCourse(AccessControlProxy<Course> controlledgenericCourse, AccessControlProxy<Database> controlleddatabase) {
+        Course course = controlledgenericCourse.getControlledObject();
+        Database database = controlleddatabase.getControlledObject();
+        return database.saveCourse(course);
+    }
+    public int saveStudent(AccessControlProxy<Student> controlledgenericCourse, AccessControlProxy<Database> controlleddatabase) {
+        Student student = controlledgenericCourse.getControlledObject();
+        Database database = controlleddatabase.getControlledObject();
+        return database.saveStudent(student);
+    }
+
+    public void viewGrades(AccessControlProxy<Student> controlledStudent) {
+        Student student = controlledStudent.getControlledObject();
+        student.viewGrades();
+    }
+
+    public void close(AccessControlProxy<Database> controlleddatabase) {
+        Database database = controlleddatabase.getControlledObject();
+        database.close();
+    }
+}
+interface ControlledObject {
+    String getCourseName();
+    int getCredits();
+    void enrollStudent(Student student);
+    void displayCourseInfo();
+
+    int getCourseID();
+    void setGrades(Student student, Course course, int grade);
+    void saveGrade(Student student, int pvl, int result);
+
+    void setId(int id);
+
+    int getId();
+}
+
+// Course interface
+interface Course extends ControlledObject {
+    void enrollStudent(Student student);
+
+    void displayCourseInfo();
+
+    String getCourseName();
+
+    int getCredits();
+
+    int getCourseID();
+    void saveGrade(Student student, int pvl, int result);
+    void setId(int id);
+}
+
+class CourseFactory implements ControlledObject {
+    public static Course createCourse(String courseType, String courseName, int credits, Professor professor) {
+        // Logic to create the specific course type based on courseType parameter
+        if (courseType.equalsIgnoreCase("generic")) {
+            return new GenericCourse(courseName, credits, professor);
+        } else if (courseType.equalsIgnoreCase("lab")) {
+            return new LabCourse(courseName+" Lab", credits, professor);
+        } else {
+            throw new IllegalArgumentException("Invalid course type: " + courseType);
+        }
+    }
+
+    public String getCourseName() {
+        return null;
+    }
+
+    public int getCredits() {
+        return 0;
+    }
+
+    public void enrollStudent(Student student) {
+
+    }
+
+    public void displayCourseInfo() {
+
+    }
+
+    public int getCourseID() {
+        return 0;
+    }
+
+    public void setGrades(Student student, Course course, int grade) {
+
+    }
+
+    public void saveGrade(Student student, int pvl, int result) {
+
+    }
+
+    public void setId(int id) {
+
+    }
+
+    @Override
+    public int getId() {
+        return 0;
+    }
+}
+
+import java.sql.*;
+
+// Database class
+class Database implements ControlledObject {
+    private Connection connection;
+
+
+    public Database() {
+        // Initialize the database connection
+        try {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/stisys", "root", "123456");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int saveStudent(Student student) {
+        String sql = "INSERT INTO user (username, password) VALUES (?, ?)";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, student.getName());
+            pstmt.setString(2, student.getPassword());
+            pstmt.executeUpdate();
+
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+
+    public int saveCourse(Course course) {
+        String sql = "INSERT INTO course (course_name, credits) VALUES (?, ?)";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setString(1, course.getCourseName());
+            pstmt.setInt(2, course.getCredits());
+            pstmt.executeUpdate();
+
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return -1;
+    }
+    public void saveGrade(Student student, Course course, int pvl, Integer result) {
+        String sql = "UPDATE results SET pvl = ?, result = ? WHERE student_id = ? AND course_id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, pvl);
+            pstmt.setInt(2, result);
+            pstmt.setInt(3, student.getId());
+            pstmt.setInt(4, course.getCourseID());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Connection getConnection() {
+    return connection;
+    }
+
+    public void close() {
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getCourseName() {
+        return null;
+    }
+
+    public int getCredits() {
+        return 0;
+    }
+
+    public void enrollStudent(Student student) {
+
+    }
+
+    public void displayCourseInfo() {
+
+    }
+
+    public int getCourseID() {
+        return 0;
+    }
+
+    public void setGrades(Student student, Course course, int grade) {
+
+    }
+
+    public void saveGrade(Student student, int pvl, int result) {
+
+    }
+
+    public void setId(int id) {
+
+    }
+
+    public int getId() {
+        return 0;
+    }
+}
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+// GenericCourse class implementing Course interface
+class GenericCourse implements Course {
+    private final String courseName;
+    private final int credits;
+    private final Professor professor;
+    private int courseID;
+
+    public GenericCourse(String courseName, int credits, Professor professor) {
+        this.courseName = courseName;
+        this.credits = credits;
+        this.professor = professor;
+    }
+
+    @Override
+    public void enrollStudent(Student student) {
+        Database database = new Database();
+        String sql = "INSERT INTO results (student_id, course_id) VALUES (?, ?)";
+
+        try (PreparedStatement pstmt = database.getConnection().prepareStatement(sql)) {
+            pstmt.setInt(1, student.getId());
+            pstmt.setInt(2, this.courseID);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    @Override
+    public void saveGrade(Student student, int pvl, int result) {
+        Database database = new Database();
+        String sql = "UPDATE results SET pvl = ?, result = ? WHERE student_id = ? AND course_id = ?";
+
+        try (PreparedStatement pstmt = database.getConnection().prepareStatement(sql)) {
+            pstmt.setInt(1, pvl);
+            pstmt.setInt(2, result);
+            pstmt.setInt(3, student.getId());
+            pstmt.setInt(4, this.courseID);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        database.close();
+    }
+    @Override
+    public void displayCourseInfo() {
+        System.out.println("Course Name: " + courseName);
+        System.out.println("Course ID: " + courseID);
+        System.out.println("Credits: " + credits);
+        System.out.println("Professor: " + professor.getName());
+    }
+
+    @Override
+    public String getCourseName() {
+        return this.courseName;
+    }
+
+    @Override
+    public int getCourseID() {
+        return this.courseID;
+    }
+
+    @Override
+    public void setGrades(Student student, Course course, int grade) {
+
+    }
+
+    @Override
+    public int getCredits() {
+        return this.credits;
+    }
+    @Override
+    public void setId(int id) {
+        this.courseID = id;
+    }
+
+    @Override
+    public int getId() {
+        return 0;
+    }
+}
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+// LabCourse class implementing Course interface
+class LabCourse implements Course {
+    private final String courseName;
+    private final int credits;
+    private final Professor professor;
+    private int courseID;
+
+    public LabCourse(String courseName, int credits, Professor professor) {
+        this.courseName = courseName;
+        this.credits = credits;
+        this.professor = professor;
+    }
+
+    @Override
+    public void enrollStudent(Student student) {
+        Database database = new Database();
+        String sql = "INSERT INTO results (student_id, course_id) VALUES (?, ?)";
+
+        try (PreparedStatement pstmt = database.getConnection().prepareStatement(sql)) {
+            pstmt.setInt(1, student.getId());
+            pstmt.setInt(2, this.courseID);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        database.close();
+    }
+
+    @Override
+    public void displayCourseInfo() {
+        System.out.println("Course Name: " + courseName);
+        System.out.println("Course ID: " + courseID);
+        System.out.println("Credits: " + credits);
+        System.out.println("Professor: " + professor.getName());
+    }
+    @Override
+    public String getCourseName() {
+        return this.courseName;
+    }
+
+    @Override
+    public int getCourseID() {
+        return this.courseID;
+    }
+
+    @Override
+    public void setGrades(Student student, Course course, int grade) {
+
+    }
+
+    @Override
+    public void saveGrade(Student student, int pvl, int result) {
+
+    }
+
+    @Override
+    public int getCredits() {
+        return this.credits;
+    }
+    @Override
+    public void setId(int id) {
+        this.courseID = id;
+    }
+
+    @Override
+    public int getId() {
+        return 0;
+    }
+}
+
+// Professor class (subclass of Employee)
+class Professor extends User implements ControlledObject {
+    private final String password;
+    private int id;
+    public Professor(String name, String password) {
+        super(name,password);
+        this.password = password;
+    }
+
+    public String getCourseName() {
+        return null;
+    }
+    public int getId() {
+        return id;
+    }
+    public int getCredits() {
+        return 0;
+    }
+
+    public void enrollStudent(Student student) {
+
+    }
+
+    public void displayCourseInfo() {
+
+    }
+
+    public int getCourseID() {
+        return 0;
+    }
+
+
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setGrades(Student student, Course course, int grade) {
+        Database db = new Database();
+        db.saveGrade(student, course, 1, grade);
+        db.close();
+    }
+
+    public void saveGrade(Student student, int pvl, int result) {
+
+    }
+
+    public String getPassword() {
+        return password;
+    }
+}
+
+public class StiSys {
+    public static void main(String[] args) {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        // Create database instance
+        Database database = new Database();
+
+        // Create professor and instructor instances
+        Professor professor = new Professor("John Doe", "cleartext");
+        Professor instructor = new Professor("Jane Smith","password");
+
+        // Create lab course
+        Course labCourse = CourseFactory.createCourse("lab","Software Engineering LAB", 3, instructor);
+        // Create generic course
+        Course genericCourse = CourseFactory.createCourse("generic","Software Engineering", 4, professor);
+
+        //Save courses to database
+        int genericCourseId = database.saveCourse(genericCourse);
+        genericCourse.setId(genericCourseId);
+        int labCourseId = database.saveCourse(labCourse);
+        labCourse.setId(labCourseId);
+
+        // Create student instance
+        Student student = new Student("Alice Johnson","cleartext");
+
+        int studentId = database.saveStudent(student);
+        student.setId(studentId);
+
+        // Enroll the student in the courses
+        genericCourse.enrollStudent(student);
+        labCourse.enrollStudent(student);
+
+        // Display course information
+        labCourse.displayCourseInfo();
+        genericCourse.displayCourseInfo();
+
+        // Professor gives PVL to the student in the lab course
+        database.saveGrade(student, labCourse, 1, 0);
+        // Student views PVL Status
+        student.viewGrades();
+
+        // Professor sets the grades for the student in the lab course
+        professor.setGrades(student, labCourse, 15);
+
+        // Student views grades after exam
+        student.viewGrades();
+
+
+        System.out.println("Controlled operations: \n");
+        //generate courses with AccessControlProxy
+
+        AccessControlProxy<Database>  controlleddatabase = AccessControlProxy.getInstance(new Database());
+        AccessControlProxy<Course> controlledgenericCourse = AccessControlProxy.getInstance(CourseFactory.createCourse("lab","Software Engineering", 3, instructor));
+        int controlledgenericCourseId = controlleddatabase.saveCourse(controlledgenericCourse, controlleddatabase);
+        controlledgenericCourse.setCourseId(controlledgenericCourseId);
+        controlledgenericCourse.displayCourseInfo(controlledgenericCourse);
+        AccessControlProxy<Professor> controlledprofessor = AccessControlProxy.getInstance(new Professor("John Doe", "cleartext"));
+        AccessControlProxy<Student> controlledStudent = AccessControlProxy.getInstance(new Student("Alice Johnson","cleartext"));
+        int controlledid = controlleddatabase.saveStudent(controlledStudent, controlleddatabase);
+        controlledStudent.setStudentId(controlledid);
+        controlledgenericCourse.enrollStudent(controlledStudent, controlledgenericCourse);
+        controlledprofessor.setGrades(controlledStudent, controlledgenericCourse, 15);
+        controlledStudent.viewGrades(controlledStudent);
+
+        // Close the database connection
+        database.close();
+        controlleddatabase.close(controlleddatabase);
+    }
+}
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+// Student class
+class Student extends User implements ControlledObject {
+
+
+    private final String name;
+    private final String password;
+    private int id;
+
+    public Student(String name, String password) {
+        super(name,password);
+        this.name = name;
+        this.password = password;
+    }
+
+    public String getCourseName() {
+        return null;
+    }
+
+    public int getCredits() {
+        return 0;
+    }
+
+    public void enrollStudent(Student student) {
+
+    }
+
+    public void displayCourseInfo() {
+
+    }
+
+    public int getCourseID() {
+        return 0;
+    }
+
+    public void setGrades(Student student, Course course, int grade) {
+
+    }
+
+    public void saveGrade(Student student, int pvl, int result) {
+
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+    public String getName() {
+        return name;
+    }
+    public String getPassword() {
+        return password;
+    }
+    public int getId() {
+        return id;
+    }
+
+    public void viewGrades() {
+        Database database = new Database();
+        String sql = "SELECT course_id, pvl, result FROM results WHERE student_id = ?";
+
+        try (PreparedStatement pstmt = database.getConnection().prepareStatement(sql)) {
+            pstmt.setInt(1, this.id);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                System.out.println("Course: " + rs.getInt("course_id"));
+                System.out.println("PVL: " + rs.getInt("pvl"));
+                System.out.println("Result: " + rs.getInt("result"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+// Employee class (base class for Professor and Instructor)
+abstract class User implements ControlledObject {
+    private final String name;
+    private int id;
+    private final String password;
+    public User(String name, String password) {
+        this.name = name;
+        this.password = password;
+    }
+    public String getPassword() {
+        return password;
+    }
+    public String getName() {
+        return name;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
+    public int getId() {
+        return id;
+    }
+
+}
+
