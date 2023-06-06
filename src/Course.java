@@ -11,12 +11,6 @@ class Course implements ControlledObject {
         this.professor = professor;
     }
 
-    public void enrollStudent(Student student) {
-        Database database = new Database();
-        database.enrollStudent(student, this.courseID);
-        database.close();
-    }
-
     public void saveGrade(Student student, int pvl, int result) {
         Database database = new Database();
         database.saveGrade(student, this, result);
@@ -51,5 +45,7 @@ class Course implements ControlledObject {
     public String getProfessor() {
         return this.professor.getName();
     }
+
+
 
 }

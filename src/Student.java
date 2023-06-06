@@ -53,6 +53,13 @@ class Student extends User {
         return id;
     }
 
+    public void enroll(Course course) {
+        Database database = new Database();
+        database.enrollStudent(this, course.getCourseID());
+        database.close();
+    }
+
+
     public void viewGrades() {
         Database database = new Database();
         database.viewGrades(this);
