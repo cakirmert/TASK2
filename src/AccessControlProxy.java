@@ -1,11 +1,4 @@
-/**
- * AccessControlProxy is the proxy class for the ControlledObject interface
- * and is the proxy for the Course and Student classes. It is responsible for
- * logging all the actions of the user and delegating method calls to the
- * ControlledObject interface.
- */
-public
-class AccessControlProxy<T extends ControlledObject> {
+public class AccessControlProxy<T extends ControlledObject> {
     private final T target;
     private final LoggingSingleton logger;
 
@@ -18,26 +11,20 @@ class AccessControlProxy<T extends ControlledObject> {
         return new AccessControlProxy<>(target);
     }
 
-    public T getControlledObject() {
-        return target;
-    }
-
     public void enrollStudent(AccessControlProxy<Student> controlledStudent, AccessControlProxy<Course> controlledgenericCourse) {
-        Student student = controlledStudent.getControlledObject();
-        Course course =controlledgenericCourse.getControlledObject();
+        Student student = controlledStudent.target;
+        Course course = controlledgenericCourse.target;
         course.enrollStudent(student);
         logger.logInfo("Enrolling student: " + student.getName() + " in course: " + course.getCourseName());
     }
 
     public void setGrades(AccessControlProxy<Student> controlledstudent, AccessControlProxy<Course> controlledcourse, int grade) {
-        Student student = controlledstudent.getControlledObject();
-        Course course = controlledcourse.getControlledObject();
+        Student student = controlledstudent.target;
+        Course course = controlledcourse.target;
         Database db = new Database();
-        db.saveGrade(student,course, 1, grade);
+        db.saveGrade(student, course, grade);
         logger.logInfo("Setting grade: " + grade + " for student: " + student.getName() + " in course: " + course.getCourseName());
-
     }
-
 
     public void setCourseId(int course) {
         target.setId(course);
@@ -47,32 +34,35 @@ class AccessControlProxy<T extends ControlledObject> {
         target.setId(id);
     }
 
-    public void displayCourseInfo(AccessControlProxy<T> courseinfo) {
-        courseinfo.getControlledObject().displayCourseInfo();
+    public void displayCourseInfo(AccessControlProxy<Course> controlledcourse) {
+        controlledcourse.target.displayCourseInfo();
     }
 
-    public int saveCourse(AccessControlProxy<Course> controlledgenericCourse, AccessControlProxy<Database> controlleddatabase) {
-        Course course = controlledgenericCourse.getControlledObject();
-        Database database = controlleddatabase.getControlledObject();
-        return database.saveCourse(course);
-    }
-    public int saveStudent(AccessControlProxy<Student> controlledgenericCourse, AccessControlProxy<Database> controlleddatabase) {
-        Student student = controlledgenericCourse.getControlledObject();
-        Database database = controlleddatabase.getControlledObject();
-        return database.saveStudent(student);
+    public int saveCourse(AccessControlProxy<Course> controlledCourse) {
+        return ((Database) target).saveCourse(controlledCourse.target);
     }
 
-    public void viewGrades(AccessControlProxy<Student> controlledStudent) {
-        Student student = controlledStudent.getControlledObject();
-        student.viewGrades();
+    public int saveStudent(AccessControlProxy<Student> controlledstudent) {
+        return ((Database) target).saveStudent(controlledstudent.target);
     }
 
-    public void close(AccessControlProxy<Database> controlleddatabase) {
-        Database database = controlleddatabase.getControlledObject();
-        database.close();
+    public void viewGrades() {
+        ((Student) target).viewGrades();
     }
-    Course callfactory(String courseType, String courseName, int credits, AccessControlProxy<Professor> professor){
-        Professor prof=professor.getControlledObject();
-      return  SystemFactory.createCourse(courseType,courseName,credits,prof);
+
+    public void close() {
+        ((Database) target).close();
+    }
+
+    Course callFactory(String courseType, String courseName, int credits, AccessControlProxy<Professor> professor) {
+        return SystemFactory.createCourse(courseType, courseName, credits, professor.target);
+    }
+
+    public void setPVL(AccessControlProxy<Student> controlledstudent, AccessControlProxy<Course> controlledcourse, int PVL) {
+        Student student = controlledstudent.target;
+        Course course = controlledcourse.target;
+        Database db = new Database();
+        db.setPVL(student, course, PVL);
+        logger.logInfo("Setting PVL: " + PVL + " for student: " + student.getName() + " in course: " + course.getCourseName());
     }
 }
