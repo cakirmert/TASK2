@@ -9,8 +9,8 @@ public class StiSys {
         Database database = new Database();
 
         // Create professor and instructor instances
-        Professor professor = new Professor("John Doe", "cleartext");
-        Professor instructor = new Professor("Jane Smith","password");
+        Professor professor = SystemFactory.createProfessor("John Doe", "cleartext");
+        Professor instructor = SystemFactory.createProfessor("Jane Smith","password");
 
         // Create lab course
         Course labCourse = SystemFactory.createCourse("lab","Software Engineering LAB", 3, instructor);
@@ -24,7 +24,7 @@ public class StiSys {
         labCourse.setId(labCourseId);
 
         // Create student instance
-        Student student = new Student("Alice Johnson","cleartext");
+        Student student = SystemFactory.createStudent("Alice Johnson","cleartext");
 
         int studentId = database.saveStudent(student);
         student.setId(studentId);
