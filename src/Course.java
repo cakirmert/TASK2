@@ -1,23 +1,22 @@
+import java.util.ArrayList;
+import java.util.List;
+
 // Course class implementing ControlledObject interface
 class Course implements ControlledObject {
     private final String courseName;
     private final int credits;
     private final Professor professor;
     private int courseID;
-    private Lab lab;
+    private List<Lab> labs;
 
     public Course(String courseName, int credits, Professor professor) {
         this.courseName = courseName;
         this.credits = credits;
         this.professor = professor;
+        this.labs = new ArrayList<>();
     }   
-
-    public Lab getLab() {
-        return lab;
-    }
-
-    public void setLab(Lab lab) {
-        this.lab = lab;
+    public void addLab(Lab lab) {
+        labs.add(lab);
     }
 
     public void saveGrade(Student student, int pvl, int result) {
@@ -53,6 +52,11 @@ class Course implements ControlledObject {
 
     public String getProfessor() {
         return this.professor.getName();
+    }
+    public void setLab(Lab lab) {
+        Database database = new Database();
+        database.addLabToCourse(this.courseID, lab.getLabID());
+        database.close();
     }
 
 
