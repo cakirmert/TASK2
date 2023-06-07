@@ -16,6 +16,10 @@ class Lab extends Course{
         return labID;
     }
 
+    public void setLabID(int labID) {
+        this.labID = labID;
+    }
+
     public String getLabName() {
         return labName;
     }

@@ -73,7 +73,7 @@ class Database implements ControlledObject {
         }
     }
 
-    public int saveCourse(Course course) {///////////////////////////LAB should be added!!!!!!!!!
+    public int saveCourse(Course course) {
         String sql = "INSERT INTO course (course_name, credits, professor_name) VALUES (?, ?, ?)";
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -91,6 +91,39 @@ class Database implements ControlledObject {
         }
 
         return -1;
+    }
+
+    public int saveLab(Lab lab) {
+        String sql = "INSERT INTO lab (course_id, professor_name) VALUES (?, ?)";
+    
+        try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            pstmt.setInt(1, lab.getCourseID());
+            pstmt.setString(2, lab.getInstructor().getName());
+            pstmt.executeUpdate();
+    
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                int labId = rs.getInt(1);
+                lab.setLabID(labId);
+                return labId;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    
+        return -1;
+    }
+
+    public void addLabToCourse(int courseId, int labId) {
+        String sql = "UPDATE lab SET course_id = ? WHERE id = ?";
+
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setInt(1, courseId);
+            pstmt.setInt(2, labId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void saveGrade(Student student, Course course, int result) {
