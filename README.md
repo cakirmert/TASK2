@@ -35,6 +35,7 @@ Set up the MySQL database:
 
 Make sure you have MySQL installed and running on your local machine.
 Create a database named "stisys".
+Use the query to create tables under database to create your tables.
 Set the database connection details (URL, username, password) in the Database class constructor.
 Compile and run the StiSys application:
 
