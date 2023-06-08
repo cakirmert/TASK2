@@ -46,5 +46,3 @@ The StiSys application demonstrates the implementation of the Singleton, Proxy, 
 
 Author: Mert Cakir
 Version: 08.06.2023
-
-Please note that this README is a general guideline to understand the design patterns implemented in the codebase. You may need to customize it according to your specific project requirements and add more details as necessary.
