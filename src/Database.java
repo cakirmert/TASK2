@@ -45,6 +45,11 @@ class Database implements ControlledObject {
         return -1;
     }
 
+    /**
+     * Enrolls a student in a course or lab.
+     * @param student The student to enroll.
+     * @param course The course or lab to enroll in.
+     */
     public void enrollStudent(Student student, Course course) {
         if (course instanceof Lab) {
             Lab lab = (Lab) course;
@@ -113,8 +118,10 @@ class Database implements ControlledObject {
         }
     }
     
-    
-
+    /**
+     * Displays information about a course.
+     * @param courseId The ID of the course.
+     */
     public void displayCourseInfo(int courseId) {
         String sql = "SELECT c.course_name, c.credits, c.professor_name, l.lab_name FROM course c LEFT JOIN lab l ON c.id = l.course_id WHERE c.id = ?";
     
@@ -140,8 +147,12 @@ class Database implements ControlledObject {
             e.printStackTrace();
         }
     }
-    
 
+    /**
+     * Saves a course to the database.
+     * @param course The course to be saved.
+     * @return The generated course ID.
+     */
     public int saveCourse(Course course) {
         String sql = "INSERT INTO course (course_name, credits, professor_name) VALUES (?, ?, ?)";
 
@@ -162,6 +173,11 @@ class Database implements ControlledObject {
         return -1;
     }
 
+    /**
+     * Saves a lab to the database.
+     * @param lab The lab to be saved.
+     * @return The generated lab ID.
+     */
     public int saveLab(Lab lab) {
         String sql = "INSERT INTO lab (course_id, professor_name, lab_name) VALUES (?, ?, ?)";
     
@@ -183,8 +199,12 @@ class Database implements ControlledObject {
     
         return -1;
     }
-    
 
+    /**
+     * Adds a lab to a course.
+     * @param courseId The ID of the course.
+     * @param labId The ID of the lab.
+     */
     public void addLabToCourse(int courseId, int labId) {
         String sql = "UPDATE lab SET course_id = ? WHERE id = ?";
 
@@ -197,6 +217,12 @@ class Database implements ControlledObject {
         }
     }
 
+    /**
+     * Saves the grade for a student in a course.
+     * @param student The student.
+     * @param course The course.
+     * @param result The grade to be saved.
+     */
     public void saveGrade(Student student, Course course, int result) {
         String selectSql = "SELECT pvl FROM results WHERE student_id = ? AND course_id = ?";
     
@@ -229,7 +255,12 @@ class Database implements ControlledObject {
         }
     }
     
-    
+    /**
+     * Sets the PVL (Pass/Fail) status for a student in a lab.
+     * @param student The student.
+     * @param lab The lab.
+     * @param pvl The PVL status (true for pass, false for fail).
+     */
     public void setPVL(Student student, Lab lab, boolean pvl) {
         int pvlValue = pvl ? 1 : 0;
     
@@ -268,7 +299,10 @@ class Database implements ControlledObject {
         }
     }
     
-
+    /**
+     * Displays the grades of a student.
+     * @param student The student.
+     */
     public void viewGrades(Student student) {
         String sql = "SELECT results.course_id, results.grade, results.pvl, course.course_name " +
                      "FROM results " +
@@ -297,7 +331,11 @@ class Database implements ControlledObject {
         }
     }
     
-    
+    /**
+     * Gets the PVL status as a string representation.
+     * @param pvl The PVL value.
+     * @return The PVL status.
+     */
     private String getPVLStatus(int pvl) {
         switch (pvl) {
             case 0:
@@ -309,12 +347,17 @@ class Database implements ControlledObject {
         }
     }
     
-    
-
+    /**
+     * Retrieves the database connection.
+     * @return The database connection.
+     */
     public Connection getConnection() {
         return connection;
     }
 
+    /**
+     * Closes the database connection.
+     */
     public void close() {
         try {
             if (connection != null) {
@@ -324,6 +367,8 @@ class Database implements ControlledObject {
             e.printStackTrace();
         }
     }
+
+    // Implementing ControlledObject interface methods
 
     public String getCourseName() {
         return null;
@@ -345,7 +390,6 @@ class Database implements ControlledObject {
 
     }
 
-
     public void setId(int id) {
 
     }
@@ -353,6 +397,4 @@ class Database implements ControlledObject {
     public int getId() {
         return 0;
     }
-
-
 }
