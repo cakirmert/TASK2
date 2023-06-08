@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS `course` (
 -- Table structure for table `lab`
 CREATE TABLE IF NOT EXISTS `lab` (
   `id` int NOT NULL AUTO_INCREMENT,
+  `lab_name` varchar(255) DEFAULT NULL,
   `course_id` int NOT NULL,
   `professor_name` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),

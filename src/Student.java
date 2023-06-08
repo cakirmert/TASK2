@@ -1,4 +1,6 @@
-// Student class
+/**
+ * The Student class represents a student that extends the User class.
+ */
 class Student extends User {
 
 
@@ -11,6 +13,33 @@ class Student extends User {
         this.name = name;
         this.password = password;
     }
+
+    /**
+     * Enrolls the student in a course.
+     * @param course The course to enroll in.
+     */
+    public void enroll(Course course) {
+        Database database = new Database();
+        database.enrollStudent(this, course);
+        database.close();
+    }
+    public void enrolllab(Lab course) {
+        Database database = new Database();
+        database.enrollStudent(this, course);
+        database.close();
+    }
+
+    /**
+     * Views the grades of the student.
+     */
+
+    public void viewGrades() {
+        Database database = new Database();
+        database.viewGrades(this);
+        database.close();
+    }
+
+    // Implemented any additional methods from User class and therefore ControlledObject interface.
 
     public String getCourseName() {
         return null;
@@ -53,17 +82,5 @@ class Student extends User {
         return id;
     }
 
-    public void enroll(Course course) {
-        Database database = new Database();
-        database.enrollStudent(this, course.getCourseID());
-        database.close();
-    }
-
-
-    public void viewGrades() {
-        Database database = new Database();
-        database.viewGrades(this);
-        database.close();
-    }
 }
 

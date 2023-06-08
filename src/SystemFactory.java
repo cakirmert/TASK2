@@ -1,15 +1,17 @@
+/**
+ * The SystemFactory class provides factory methods for creating various objects in the system.
+ * It implements the Factory Method design pattern.
+ */
 class SystemFactory {
-    public static Course createCourse(String courseType, String courseName, int credits, Professor professor, Course course) {
-        if (courseType.equalsIgnoreCase("generic")) {
+    public static Course createCourse(String courseName, int credits, Professor professor) {
             return new Course(courseName, credits, professor);
-        } else if (courseType.equalsIgnoreCase("lab")) {
-            Lab lab = new Lab(courseName, credits, professor);
-            course.setLab(lab);
-            return lab;
-        } else {
-            throw new IllegalArgumentException("Invalid course type: " + courseType);
-        }
     }
+    public static Lab createLab(String labName, int credits, Professor professor, Course course) {
+        Lab lab = new Lab(labName, credits, professor, course);
+        course.setLab(lab);
+        return lab;
+    }
+    
 
     public static Student createStudent(String name, String password) {
         return new Student(name, password);

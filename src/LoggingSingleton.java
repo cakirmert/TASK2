@@ -4,6 +4,10 @@ import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.SimpleFormatter;
 
+/**
+ * The LoggingSingleton class represents a singleton logger instance.
+ * It implements the Singleton design pattern.
+ */
 public class LoggingSingleton {
     private static LoggingSingleton instance;
     private Logger logger;
@@ -14,6 +18,10 @@ public class LoggingSingleton {
         configureLogger();
     }
 
+    /**
+     * Returns the singleton instance of LoggingSingleton.
+     * @return The LoggingSingleton instance.
+     */
     public static LoggingSingleton getInstance() {
         if (instance == null) {
             synchronized (LoggingSingleton.class) {
@@ -25,17 +33,33 @@ public class LoggingSingleton {
         return instance;
     }
 
+    /**
+     * Logs an information message.
+     * @param message The log message.
+     */
     public void logInfo(String message) {
         logger.info(message);
     }
 
+    /**
+     * Logs a warning message.
+     * @param message The log message.
+     */
     public void logWarning(String message) {
         logger.warning(message);
     }
 
+    /**
+     * Logs an error message.
+     * @param message The log message.
+     */
     public void logError(String message) {
         logger.severe(message);
     }
+
+    /**
+     * Configures the logger.
+     */
     private void configureLogger() {
         try {
             // Create a FileHandler to log messages into a file

@@ -1,6 +1,8 @@
 import java.sql.*;
 
-// Database class
+/**
+ * The Database class represents a controlled object that implements the ControlledObject interface.
+ */
 class Database implements ControlledObject {
     
     private Connection connection;
@@ -19,6 +21,11 @@ class Database implements ControlledObject {
         }
     }
 
+    /**
+     * Saves a student to the database.
+     * @param student The student to be saved.
+     * @return The generated student ID.
+     */
     public int saveStudent(Student student) {
         String sql = "INSERT INTO user (username, password) VALUES (?, ?)";
 
@@ -38,40 +45,102 @@ class Database implements ControlledObject {
         return -1;
     }
 
-    public void enrollStudent(Student student, int courseId) {
-        String sql = "INSERT INTO results (student_id, course_id) VALUES (?, ?)";
-
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, student.getId());
-            pstmt.setInt(2, courseId);
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public void enrollStudent(Student student, Course course) {
+        if (course instanceof Lab) {
+            Lab lab = (Lab) course;
+    
+            // Check if the lab or course already exists in the results table for the student
+            String checkResultSql = "SELECT * FROM results WHERE student_id = ? AND (course_id = ? OR lab_id = ?)";
+            try (PreparedStatement pstmt = connection.prepareStatement(checkResultSql)) {
+                pstmt.setInt(1, student.getId());
+                pstmt.setInt(2, lab.getCourse().getCourseID());
+                pstmt.setInt(3, lab.getLabID());
+                ResultSet rs = pstmt.executeQuery();
+    
+                if (rs.next()) {
+                    // Entry exists, perform an update
+                    String updateResultSql = "UPDATE results SET lab_id = ? WHERE student_id = ? AND (course_id = ? OR lab_id = ?)";
+                    try (PreparedStatement updatePstmt = connection.prepareStatement(updateResultSql)) {
+                        updatePstmt.setInt(1, lab.getLabID());
+                        updatePstmt.setInt(2, student.getId());
+                        updatePstmt.setInt(3, lab.getCourse().getCourseID());
+                        updatePstmt.setInt(4, lab.getLabID());
+                        updatePstmt.executeUpdate();
+                    }
+                    return;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return;
+            }
+    
+            // Enroll student in the lab
+            String enrollLabSql = "INSERT INTO results (student_id, course_id, lab_id) VALUES (?, ?, ?)";
+            try (PreparedStatement pstmt = connection.prepareStatement(enrollLabSql)) {
+                pstmt.setInt(1, student.getId());
+                pstmt.setInt(2, lab.getCourse().getCourseID());
+                pstmt.setInt(3, lab.getLabID());
+                pstmt.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // Check if the course already exists in the results table for the student
+            String checkCourseSql = "SELECT * FROM results WHERE student_id = ? AND course_id = ?";
+            try (PreparedStatement pstmt = connection.prepareStatement(checkCourseSql)) {
+                pstmt.setInt(1, student.getId());
+                pstmt.setInt(2, course.getCourseID());
+                ResultSet rs = pstmt.executeQuery();
+    
+                if (rs.next()) {
+                    System.out.println("Student is already enrolled in Course with ID " + course.getCourseID());
+                    return;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return;
+            }
+    
+            // Enroll student in the regular course
+            String enrollCourseSql = "INSERT INTO results (student_id, course_id) VALUES (?, ?)";
+            try (PreparedStatement pstmt = connection.prepareStatement(enrollCourseSql)) {
+                pstmt.setInt(1, student.getId());
+                pstmt.setInt(2, course.getCourseID());
+                pstmt.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
-
+    
+    
 
     public void displayCourseInfo(int courseId) {
-        String sql = "SELECT course_name, credits, professor_name FROM course WHERE id = ?";
-
+        String sql = "SELECT c.course_name, c.credits, c.professor_name, l.lab_name FROM course c LEFT JOIN lab l ON c.id = l.course_id WHERE c.id = ?";
+    
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setInt(1, courseId);
             ResultSet rs = pstmt.executeQuery();
-
+    
             if (rs.next()) {
                 String courseName = rs.getString("course_name");
                 int credits = rs.getInt("credits");
                 String professorName = rs.getString("professor_name");
-
+                String labName = rs.getString("lab_name");
+    
                 System.out.println("Course Name: " + courseName);
                 System.out.println("Course ID: " + courseId);
                 System.out.println("Credits: " + credits);
                 System.out.println("Professor: " + professorName);
+                if (labName != null) {
+                    System.out.println("Lab: " + labName);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+    
 
     public int saveCourse(Course course) {
         String sql = "INSERT INTO course (course_name, credits, professor_name) VALUES (?, ?, ?)";
@@ -94,11 +163,12 @@ class Database implements ControlledObject {
     }
 
     public int saveLab(Lab lab) {
-        String sql = "INSERT INTO lab (course_id, professor_name) VALUES (?, ?)";
+        String sql = "INSERT INTO lab (course_id, professor_name, lab_name) VALUES (?, ?, ?)";
     
         try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            pstmt.setInt(1, lab.getCourseID());
+            pstmt.setInt(1, lab.getCourse().getCourseID());
             pstmt.setString(2, lab.getInstructor().getName());
+            pstmt.setString(3, lab.getLabName());
             pstmt.executeUpdate();
     
             ResultSet rs = pstmt.getGeneratedKeys();
@@ -113,6 +183,7 @@ class Database implements ControlledObject {
     
         return -1;
     }
+    
 
     public void addLabToCourse(int courseId, int labId) {
         String sql = "UPDATE lab SET course_id = ? WHERE id = ?";
@@ -127,25 +198,24 @@ class Database implements ControlledObject {
     }
 
     public void saveGrade(Student student, Course course, int result) {
-        String sql = "SELECT pvl FROM results WHERE student_id = ? AND course_id = ?";
-        
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, student.getId());
-            pstmt.setInt(2, course.getCourseID());
-            ResultSet rs = pstmt.executeQuery();
+        String selectSql = "SELECT pvl FROM results WHERE student_id = ? AND course_id = ?";
+    
+        try (PreparedStatement selectPstmt = connection.prepareStatement(selectSql)) {
+            selectPstmt.setInt(1, student.getId());
+            selectPstmt.setInt(2, course.getCourseID());
+            ResultSet rs = selectPstmt.executeQuery();
     
             if (rs.next()) {
                 Integer pvl = rs.getInt("pvl");
-                
+    
                 if (pvl == 0) {
                     System.out.println("Error: Student didn't pass the lab.");
-                } else if (pvl == 1 || pvl == null) {
-                    String updateSql = "UPDATE results SET pvl = ?, grade = ? WHERE student_id = ? AND course_id = ?";
+                } else if (pvl == 1) {
+                    String updateSql = "UPDATE results SET grade = ? WHERE student_id = ? AND course_id = ?";
                     try (PreparedStatement updatePstmt = connection.prepareStatement(updateSql)) {
-                        updatePstmt.setInt(1, pvl);
-                        updatePstmt.setInt(2, result);
-                        updatePstmt.setInt(3, student.getId());
-                        updatePstmt.setInt(4, course.getCourseID());
+                        updatePstmt.setInt(1, result);
+                        updatePstmt.setInt(2, student.getId());
+                        updatePstmt.setInt(3, course.getCourseID());
                         updatePstmt.executeUpdate();
                     }
                 } else {
@@ -159,28 +229,51 @@ class Database implements ControlledObject {
         }
     }
     
-
-    public void setPVL(Student student, Course course, boolean pvl) {
+    
+    public void setPVL(Student student, Lab lab, boolean pvl) {
         int pvlValue = pvl ? 1 : 0;
     
-        String sql = "UPDATE results SET pvl = ? WHERE student_id = ? AND course_id = ?";
+        // Check if the entry already exists
+        String selectSql = "SELECT * FROM results WHERE student_id = ? AND course_id = ?";
     
-        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
-            pstmt.setInt(1, pvlValue);
-            pstmt.setInt(2, student.getId());
-            pstmt.setInt(3, course.getCourseID());
-            pstmt.executeUpdate();
+        try (PreparedStatement selectPstmt = connection.prepareStatement(selectSql)) {
+            selectPstmt.setInt(1, student.getId());
+            selectPstmt.setInt(2, lab.getCourse().getCourseID());
+            ResultSet rs = selectPstmt.executeQuery();
+    
+            if (rs.next()) {
+                // Entry exists, perform an update
+                String updateSql = "UPDATE results SET pvl = ? WHERE student_id = ? AND lab_id = ?";
+    
+                try (PreparedStatement updatePstmt = connection.prepareStatement(updateSql)) {
+                    updatePstmt.setInt(1, pvlValue);
+                    updatePstmt.setInt(2, student.getId());
+                    updatePstmt.setInt(3, lab.getLabID());
+                    updatePstmt.executeUpdate();
+                }
+            } else {
+                // Entry doesn't exist, perform an insert
+                String insertSql = "INSERT INTO results (student_id, course_id, lab_id, pvl) VALUES (?, ?, ?, ?)";
+    
+                try (PreparedStatement insertPstmt = connection.prepareStatement(insertSql)) {
+                    insertPstmt.setInt(1, student.getId());
+                    insertPstmt.setInt(2, lab.getCourse().getCourseID());
+                    insertPstmt.setInt(3, lab.getLabID());
+                    insertPstmt.setInt(4, pvlValue);
+                    insertPstmt.executeUpdate();
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     
-    
 
     public void viewGrades(Student student) {
-        String sql = "SELECT results.course_id, results.pvl, results.grade, course.course_name " +
+        String sql = "SELECT results.course_id, results.grade, results.pvl, course.course_name " +
                      "FROM results " +
                      "INNER JOIN course ON results.course_id = course.id " +
+                     "LEFT JOIN lab ON results.lab_id = lab.id " +
                      "WHERE results.student_id = ?";
     
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -189,24 +282,21 @@ class Database implements ControlledObject {
     
             while (rs.next()) {
                 int courseId = rs.getInt("course_id");
-                int pvl = rs.getInt("pvl");
+                int grade = rs.getInt("grade");
+                int labPVL = rs.getInt("pvl");
                 String courseName = rs.getString("course_name");
     
                 System.out.println("Course: " + courseName);
                 System.out.println("Course ID: " + courseId);
-                System.out.println("PVL: " + getPVLStatus(pvl));
-    
-                if (pvl == 2) {
-                    int grade = rs.getInt("grade");
-                    System.out.println("Grade: " + grade);
-                }
-    
+                System.out.println("Grade: " + grade);
+                System.out.println("Lab PVL: " + getPVLStatus(labPVL));
                 System.out.println();
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
+    
     
     private String getPVLStatus(int pvl) {
         switch (pvl) {
@@ -241,10 +331,6 @@ class Database implements ControlledObject {
 
     public int getCredits() {
         return 0;
-    }
-
-    public void enrollStudent(Student student) {
-
     }
 
     public void displayCourseInfo() {

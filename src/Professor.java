@@ -1,4 +1,6 @@
-// Professor class (subclass of Employee)
+/**
+ * The Professor class represents a professor that extends the User class.
+ */
 class Professor extends User {
     private final String password;
     private int id;
@@ -6,6 +8,20 @@ class Professor extends User {
         super(name,password);
         this.password = password;
     }
+
+    /**
+     * Sets the grades for a student in a course.
+     * @param student The student.
+     * @param course The course.
+     * @param grade The grade to be set.
+     */
+    public void setGrades(Student student, Course course, int grade) {
+        Database db = new Database();
+        db.saveGrade(student, course, grade);
+        db.close();
+    }
+
+    // Implemented any additional methods from User class and therefore ControlledObject interface.
 
     public String getCourseName() {
         return null;
@@ -15,10 +31,6 @@ class Professor extends User {
     }
     public int getCredits() {
         return 0;
-    }
-
-    public void enrollStudent(Student student) {
-
     }
 
     public void displayCourseInfo() {
@@ -31,16 +43,6 @@ class Professor extends User {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public void setGrades(Student student, Course course, int grade) {
-        Database db = new Database();
-        db.saveGrade(student, course, grade);
-        db.close();
-    }
-
-    public void saveGrade(Student student, int pvl, int result) {
-
     }
 
     public String getPassword() {

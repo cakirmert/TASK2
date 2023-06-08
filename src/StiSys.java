@@ -1,3 +1,7 @@
+/**
+ * The StiSys class represents the main class of the StiSys application.
+ * It contains the main method to run the application.
+ */
 public class StiSys {
     public static void main(String[] args) {
 
@@ -8,25 +12,25 @@ AccessControlProxy<Database> controlledDatabase = AccessControlProxy.getInstance
 AccessControlProxy<Professor> controlledInstructor = AccessControlProxy.getInstance(SystemFactory.createProfessor("Jane Doe", "cleartext"));
 AccessControlProxy<Professor> controlledProfessor = AccessControlProxy.getInstance(SystemFactory.createProfessor("John Doe", "cleartext"));
 
-// Create controlled lab course
-AccessControlProxy<Course> controlledCourse = AccessControlProxy.getInstance(controlledDatabase.callFactory("generic","Software Engineering", 3, controlledProfessor,null));
-AccessControlProxy<Course> controlledLab = AccessControlProxy.getInstance(controlledDatabase.callFactory("lab","Software Engineering", 3, controlledInstructor,controlledCourse));
+// Create controlled courses
+AccessControlProxy<Course> controlledCourse = AccessControlProxy.getInstance(controlledDatabase.createCourse("Software Engineering", 3, controlledProfessor));
+AccessControlProxy<Lab> controlledLab = AccessControlProxy.getInstance(controlledDatabase.createLab("Software Engineering Lab", 3, controlledInstructor,controlledCourse));
 
-controlledLab.setCourseId(controlledDatabase.saveCourse(controlledLab));
 controlledCourse.setCourseId(controlledDatabase.saveCourse(controlledCourse));
+controlledLab.setCourseId(controlledDatabase.saveLab(controlledLab));
 
 // Create controlled student instance
 AccessControlProxy<Student> controlledStudent = AccessControlProxy.getInstance(SystemFactory.createStudent("Alice Johnson", "cleartext"));
 
-int controlledStudentId = controlledDatabase.saveStudent(controlledStudent);
-controlledStudent.setStudentId(controlledStudentId);
+// Save the student in the database
+controlledStudent.setStudentId(controlledDatabase.saveStudent(controlledStudent));
 
 // Enroll the student in the courses
-controlledStudent.enroll(controlledLab);
 controlledStudent.enroll(controlledCourse);
+controlledStudent.enrolllab(controlledLab);
 
 // Display course information
-controlledLab.displayCourseInfo(controlledLab);
+controlledLab.displayCourseInfolab(controlledLab);
 controlledLab.displayCourseInfo(controlledCourse);
 
 // Professor gives PVL and grade to the student in the lab course
