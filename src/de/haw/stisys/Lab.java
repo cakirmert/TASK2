@@ -1,3 +1,4 @@
+package de.haw.stisys;
 /**
  * The Lab class represents a lab course that extends the Course class.
  */

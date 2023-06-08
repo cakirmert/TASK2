@@ -1,3 +1,4 @@
+package de.haw.stisys;
 /**
  * The Professor class represents a professor that extends the User class.
  */

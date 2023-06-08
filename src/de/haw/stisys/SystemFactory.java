@@ -1,3 +1,5 @@
+package de.haw.stisys;
+
 /**
  * The SystemFactory class provides factory methods for creating various objects in the system.
  * It implements the Factory Method design pattern.

@@ -1,3 +1,5 @@
+package de.haw.stisys;
+
 /**
  * The Student class represents a student that extends the User class.
  */

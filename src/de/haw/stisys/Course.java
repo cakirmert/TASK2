@@ -1,3 +1,4 @@
+package de.haw.stisys;
 /**
  * The Course class represents a course that implements the ControlledObject interface.
  */

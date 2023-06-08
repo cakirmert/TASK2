@@ -1,3 +1,5 @@
+package de.haw.stisys;
+
 /**
  * The User class represents a user in the system.
  * It serves as a base class for Student and Professor.

@@ -1,3 +1,5 @@
+package de.haw.stisys;
+
 /**
  * The AccessControlProxy class acts as a proxy for accessing controlled objects.
  * It provides access control checks and additional functionality before allowing method execution.

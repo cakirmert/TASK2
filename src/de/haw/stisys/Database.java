@@ -1,4 +1,10 @@
-import java.sql.*;
+package de.haw.stisys;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * The Database class represents a controlled object that implements the ControlledObject interface.

@@ -1,3 +1,5 @@
+package de.haw.stisys;
+
 /**
  * The StiSys class represents the main class of the StiSys application.
  * It contains the main method to run the application.
