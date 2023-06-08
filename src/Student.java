@@ -23,9 +23,14 @@ class Student extends User {
         database.enrollStudent(this, course);
         database.close();
     }
-    public void enrolllab(Lab course) {
+    
+    /**
+     * Enrolls the student in a lab.
+     * @param lab The lab to enroll in.
+     */
+    public void enrolllab(Lab lab) {
         Database database = new Database();
-        database.enrollStudent(this, course);
+        database.enrollStudent(this, lab);
         database.close();
     }
 
