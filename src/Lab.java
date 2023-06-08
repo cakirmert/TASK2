@@ -18,10 +18,16 @@ class Lab extends Course{
     }
     
 
+    /**
+     * Gets the Course of the lab.
+     * @return The Course.
+     */
     public Course getCourse() {
         return course;
     }
-
+    /**
+     * Displays information about the Lab.
+     */
     public void displayCourseInfo() {
         Database database = new Database();
         database.displayCourseInfo(this.labID);
