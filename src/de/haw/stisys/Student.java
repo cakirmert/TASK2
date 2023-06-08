@@ -56,24 +56,12 @@ class Student extends User {
         return 0;
     }
 
-    public void enrollStudent(Student student) {
-
-    }
-
     public void displayCourseInfo() {
 
     }
 
     public int getCourseID() {
         return 0;
-    }
-
-    public void setGrades(Student student, Course course, int grade) {
-
-    }
-
-    public void saveGrade(Student student, int pvl, int result) {
-
     }
 
     public void setId(int id) {

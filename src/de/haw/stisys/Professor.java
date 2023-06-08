@@ -10,18 +10,6 @@ class Professor extends User {
         this.password = password;
     }
 
-    /**
-     * Sets the grades for a student in a course.
-     * @param student The student.
-     * @param course The course.
-     * @param grade The grade to be set.
-     */
-    public void setGrades(Student student, Course course, int grade) {
-        Database db = new Database();
-        db.saveGrade(student, course, grade);
-        db.close();
-    }
-
     // Implemented any additional methods from User class and therefore ControlledObject interface.
 
     public String getCourseName() {

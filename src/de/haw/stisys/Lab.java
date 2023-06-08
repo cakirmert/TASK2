@@ -35,9 +35,6 @@ class Lab extends Course{
         database.close();
     }
 
-    public void setCourse(Course course) {
-        this.course = course;
-    }
     /**
      * Gets the ID of the lab.
      * @return The lab ID.
@@ -97,7 +94,4 @@ class Lab extends Course{
      * Sets the PVL (Pass/Fail) status of the lab.
      * @param pvl The PVL status to be set.
      */
-    public void setLabPVL(boolean pvl) {
-        this.labPVL = pvl;
-    }
 }

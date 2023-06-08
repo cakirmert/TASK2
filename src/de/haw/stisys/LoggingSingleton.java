@@ -51,14 +51,6 @@ public class LoggingSingleton {
     }
 
     /**
-     * Logs an error message.
-     * @param message The log message.
-     */
-    public void logError(String message) {
-        logger.severe(message);
-    }
-
-    /**
      * Configures the logger.
      */
     private void configureLogger() {

@@ -15,18 +15,6 @@ class Course implements ControlledObject {
     }   
 
     /**
-     * Saves the grade of a student in the course.
-     * @param student The student.
-     * @param pvl The PVL (Pass/Fail) status.
-     * @param result The grade result.
-     */
-    public void saveGrade(Student student, int pvl, int result) {
-        Database database = new Database();
-        database.saveGrade(student, this, result);
-        database.close();
-    }
-
-    /**
      * Displays information about the course.
      */
     public void displayCourseInfo() {
@@ -49,16 +37,6 @@ class Course implements ControlledObject {
      */
     public int getCourseID() {
         return this.courseID;
-    }
-
-    /**
-     * Sets the grades of a student in the course.
-     * @param student The student.
-     * @param course The course.
-     * @param grade The grade to be set.
-     */
-    public void setGrades(Student student, Course course, int grade) {
-
     }
 
     /**
