@@ -13,12 +13,14 @@ Singleton Design Pattern:
 The LoggingSingleton class represents a singleton logger instance. It ensures that only one instance of the logger is created throughout the application.
 The singleton pattern guarantees global access to the logger object and provides a centralized logging mechanism.
 This pattern is employed to encapsulate the logger functionality, promote code reusability, and ensure thread-safe access to the logger instance.
+
 Proxy Design Pattern:
 
 The AccessControlProxy class acts as a proxy for accessing controlled objects such as students, courses, and labs.
 It provides access control checks and additional functionality before allowing method execution.
 The proxy pattern enables fine-grained control over access to controlled objects, allowing for additional validation or logging operations.
 In this codebase, the proxy is used to enforce access control based on user roles (Professor or Student) before performing operations like enrolling in courses, setting grades, and setting PVL (Pass/Fail) status.
+
 Factory Method Design Pattern:
 
 The SystemFactory class provides factory methods for creating various objects in the system, such as courses, labs, students, professors, and the database.
