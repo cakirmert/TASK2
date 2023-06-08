@@ -1,6 +1,8 @@
 /**
  * The StiSys class represents the main class of the StiSys application.
  * It contains the main method to run the application.
+ * Author: Mert Cakir
+ * Version: 08.06.2023
  */
 public class StiSys {
     public static void main(String[] args) {
